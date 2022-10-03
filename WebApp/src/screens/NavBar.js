@@ -20,6 +20,7 @@ import Home from './Home';
 import SportsBook from './SportsBook';
 import CabShare from './CabShare';
 import EmptyClass from './EmptyClass';
+import LoginSignUp from './LoginSignUp';
 
 
 
@@ -167,7 +168,6 @@ class ResponsiveAppBar extends Component{
           </Box>
 
           <Box sx={{ flexGrow: 0 }}>
-          
             <Tooltip title="Open settings">
               <IconButton onClick={(event)=>{if(this.state.anchorElUser===null){this.setState({anchorElUser : event.currentTarget })}
                                               else {this.setState({anchorElUser : null })}}} sx={{ p: 0 }}>
@@ -192,7 +192,7 @@ class ResponsiveAppBar extends Component{
             >
 
                   <MenuItem onClick={()=>{this.setState({anchorElUser : null})}}>
-                  <Button variant="contained" onClick={()=>{this.setState({navigate:4})}}>Profile</Button>
+                  <Button variant="contained" onClick={()=>{this.setState({navigate:4});history.push('/LoginSignUp')}}>Login/Sign Up</Button>
                   </MenuItem>
                   <MenuItem  onClick={()=>{this.setState({anchorElUser : null})}}>
                   <Button  variant="contained" onClick={()=>{this.setState({navigate:5})}}>Logout</Button>
@@ -296,6 +296,7 @@ class ResponsiveAppBar extends Component{
               <Route path='/SportsBook' component={SportsBook} />
               <Route path='/EmptyClass' component={EmptyClass} />
               <Route path='/CabShare' component={CabShare} />
+              <Route path='/LoginSignUp' component={LoginSignUp} />
           </Switch>
         </div>
       </Router>
