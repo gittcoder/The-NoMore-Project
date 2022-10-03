@@ -7,7 +7,7 @@
 //      * Connection URI. Update <username>, <password>, and <your-cluster-url> to reflect your cluster.
 //      * See https://docs.mongodb.com/ecosystem/drivers/node/ for more details
 //      */
-//     const uri = "mongodb+srv://peekaboo682:FqJDoggThKtwxQh6@cluster0.kiqskwt.mongodb.net/?retryWrites=true&w=majority";
+//     const uri = "mongodb+srv://usr:pwd@cluster0.kiqskwt.mongodb.net/?retryWrites=true&w=majority";
 
 //     /**
 //      * The Mongo Client you will use to interact with your database
@@ -50,7 +50,7 @@ const { MongoClient } = require('mongodb');
 
 async function main() {
     
-    const uri = "mongodb+srv://peekaboo682:FqJDoggThKtwxQh6@cluster0.kiqskwt.mongodb.net/?retryWrites=true&w=majority";
+    const uri = "mongodb+srv://usr:pwd@cluster0.kiqskwt.mongodb.net/?retryWrites=true&w=majority";
      const client = new MongoClient(uri);
 
      try {
