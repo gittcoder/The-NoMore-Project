@@ -1,0 +1,27 @@
+.about-img{
+    border-radius:10px;
+    width:400px;
+}
+
+.about-table{
+    margin-left: auto;
+    margin-right: auto;
+    width:80%;
+}
+
+.about-table{
+    text-align:center;
+}
+.about-page{
+    text-align: center;
+    background-color:#F0F3F7;
+}
+
+.about-tr{
+    margin:30px;
+    padding:20px;
+}
+.about-td{
+    padding:2%;
+    margin:2%;
+}

@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { Component } from 'react';
-import About from './About';
+import About from './Aboutdiv';
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
@@ -9,21 +9,22 @@ import Typography from '@mui/material/Typography';
 import Menu from '@mui/material/Menu';
 import MenuIcon from '@mui/icons-material/Menu';
 import Container from '@mui/material/Container';
-import Button from '@mui/material/Button';
 import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
 import AccountCircle from '@mui/icons-material/AccountCircle';
-import history from '../utils/history';
 import ScheduleEvents from './ScheduleEvents'
-import { BrowserRouter as Router, Switch, Route, Link } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
 import Home from './Home';
 import SportsBook from './SportsBook';
 import CabShare from './CabShare';
 import EmptyClass from './EmptyClass';
 import LoginSignUp from './LoginSignUp';
-
-
-
+import SignUp from './SignUp';
+import EventsForm from "../components/EventsForm";
+import { connect } from 'react-redux';
+import UpdateEvents from '../components/UpdateEvents';
+import AddCab from '../components/AddCab';
+import ContactUs from './contact'
 
 
 class ResponsiveAppBar extends Component{
@@ -31,9 +32,29 @@ class ResponsiveAppBar extends Component{
   state={
     anchorElNav : null ,
     anchorElUser :null ,
-    navigate:0, 
+    navigate:0,
+    signedIn:false,
+    divertToLogin:false,
+    option:"Login",
+    nav:"/LoginSignUp",
+    client: null,
+    checked:false,
   }
+
   
+  // componentDidUpdate()
+  // {
+  //   console.log("INSIDE NAVBAR");
+  //   console.log(this.props);
+  //   if(this.props.loggedIn===true&&this.state.checked===false)
+  //   {
+  //     this.setState({signedIn:true,option:"hello "+this.props.user+" !!!",checked:true});
+  //   }
+  //   else if(this.props.loggedIn===false&&this.state.checked===true)
+  //   {
+  //     this.setState({signedIn:false,option:"Login",checked:false});
+  //   }
+  // }
   
   
 
@@ -43,7 +64,7 @@ class ResponsiveAppBar extends Component{
 
   return (
     <div className='Home'>
-      <Router>
+       <BrowserRouter>
     <AppBar position="static" style={{backgroundColor:'#547189'}}>
       <Container maxWidth="xl">
         <Toolbar disableGutters>
@@ -88,7 +109,7 @@ class ResponsiveAppBar extends Component{
             >
               
                   <MenuItem onClick={()=>{this.setState({anchorElNav : null})}}>
-                  <Link to={'/'} className="nav-link"> Home </Link>
+                  <Link to={'/Home'} className="nav-link"> Home </Link>
             
             
                   </MenuItem>
@@ -105,7 +126,7 @@ class ResponsiveAppBar extends Component{
                                               else {this.setState({anchorElUser : null })}}} sx={{ p: 0 }}
                                               variant="contained"
                                               aria-label="account of current user"
-              aria-controls="menu-appbar"
+              aria-controls="menu- vaarana"
               aria-haspopup="true"
               >
                     Features
@@ -125,9 +146,10 @@ class ResponsiveAppBar extends Component{
           </Typography>
           <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
           
-          <Link to={'/'} className="nav-link" style={{padding:"10px 10px 10px",color:"white"}}> Home </Link>
-          <Link to={'/announcement'} className="nav-link" style={{padding:"10px 10px 10px"}}>Contact</Link>
-          <Link to={'/about'} className="nav-link" style={{padding:"10px 10px 10px"}}>About</Link>
+          
+          <Link to={"/"} style={{color:"white",textDecoration:"none",padding:"10px 10px 10px"}}>Home</Link>
+          <Link to={"/Contact"} style={{color:"white",textDecoration:"none",padding:"10px 10px 10px"}}>Contact</Link>
+          <Link to={"/about"} style={{color:"white",textDecoration:"none",padding:"10px 10px 10px"}}>About</Link>
             {/* <Tooltip id = "ShowFeatures" title="Show Features" style={{color:'white'}}>
               <Button onClick={(event)=>{if(this.state.anchorElUser===null){this.setState({anchorElUser : event.currentTarget })}
                                               else {this.setState({anchorElUser : null })}}} sx={{ p: 0 }}>
@@ -192,11 +214,13 @@ class ResponsiveAppBar extends Component{
             >
 
                   <MenuItem onClick={()=>{this.setState({anchorElUser : null})}}>
-                  <Button variant="contained" onClick={()=>{this.setState({navigate:4});history.push('/LoginSignUp')}}>Login/Sign Up</Button>
+                  {/* <Link to = "/LoginSignUp" underline='hover' variant='h4' sx={{textDecoration:"none"}}>Login/Sign Up</Link> */}
+                  {/* <Button variant="contained" onClick={()=>{this.setState({navigate:4});history.push('/LoginSignUp')}}>Login/Sign Up</Button> */}
+                  <Link to={this.state.nav} style={{color:"black",textDecoration:"none"}}>{this.state.option}</Link>
                   </MenuItem>
-                  <MenuItem  onClick={()=>{this.setState({anchorElUser : null})}}>
+                  {/* <MenuItem  onClick={()=>{this.setState({anchorElUser : null})}}>
                   <Button  variant="contained" onClick={()=>{this.setState({navigate:5})}}>Logout</Button>
-                  </MenuItem>
+                  </MenuItem> */}
             </Menu>
           
  
@@ -286,20 +310,35 @@ class ResponsiveAppBar extends Component{
       </Container>
     </AppBar>
     {/* <ScheduleEvents></ScheduleEvents> */}
-    
-        <div>
-          <Switch>
-              <Route exact path='/' component={Home} />
-              <Route path='/announcement' component={About} />
-              <Route path='/about' component={About} />
-              <Route path='/ScheduleEvents' component={ScheduleEvents} />
-              <Route path='/SportsBook' component={SportsBook} />
-              <Route path='/EmptyClass' component={EmptyClass} />
-              <Route path='/CabShare' component={CabShare} />
-              <Route path='/LoginSignUp' component={LoginSignUp} />
-          </Switch>
-        </div>
-      </Router>
+   
+    <Routes>
+              <Route exact path='/' element={<Home/>} />
+              <Route path='Contact' element={<ContactUs/>} />
+              <Route path='about' element={<About/>} />
+              <Route path='ScheduleEvents' element={<ScheduleEvents/>} />
+              <Route path='SportsBook' element={<SportsBook/>} />
+              <Route path='EmptyClass' element={<EmptyClass/>} />
+              <Route path='CabShare' element={<CabShare/>} />
+              <Route path='LoginSignUp' element={<LoginSignUp/>} />
+              <Route path='SignUp' element={<SignUp/>} />
+              <Route path='AddEvent' element={<EventsForm/>} />
+              <Route path='UpdateEvents' element={<UpdateEvents/>} />
+              <Route path='AddCab' element={<AddCab/>} />
+              <Route
+      path="*"
+      element={
+        <main style={{ padding: "1rem" }}>
+          <p>There's nothing here!</p>
+        </main>
+      }
+    />
+  
+          </Routes>
+          </BrowserRouter>
+          {/* <div style={{position:"relative",top:"100%"}}>
+    <Footer/>
+    </div> */}
+     
     {/* <Announcements display={this.state.navigate}/> */}
     {/* <TakeQuiz display={this.state.navigate}/>
     <Recruitment display={this.state.navigate}/>
@@ -309,7 +348,20 @@ class ResponsiveAppBar extends Component{
   );
 }
 }
+const mapStateToProps = (state)=>
+{
+  return{
+    loggedIn:state.loggedIn,
+    user:state.user,
+  }
+}
 
+const mapDispatchToProps = (dispatch)=>
+{
+  return{
+    addEvent: (events)=>{dispatch({type:"ADD_EVENT",events:events})}
+  }
+}
+export default connect(mapStateToProps,mapDispatchToProps)(ResponsiveAppBar);
 
-export default ResponsiveAppBar;
 

@@ -1,0 +1,18 @@
+.grid-container-class{
+display:grid;
+grid-template-columns: auto auto auto auto auto;
+width:70%;
+margin:auto;
+
+}
+
+.grid-item-class{
+    padding:2px;
+    margin:3px;
+
+}
+
+.available-class-pop{
+text-align:center;
+
+}

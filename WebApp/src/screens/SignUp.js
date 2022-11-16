@@ -6,16 +6,14 @@ import CardContent from '@mui/material/CardContent';
 import {Grid} from '@mui/material/';
 import { Fade } from '@mui/material';
 import TextField from '@mui/material/TextField';
-import { Google } from "@mui/icons-material";
 import axios from '../utils/axios';
 import { Link } from 'react-router-dom';
 
-import { connect } from 'react-redux';
 
 
   
 
-class LoginSignUp extends Component{
+class SignUp extends Component{
   
 state={
   user:"",
@@ -23,9 +21,10 @@ state={
   errMsg:"",
   loggedIn:false,
   events:[],
-  msg:"",
-  but:"",
-  nav:"/",
+  repwd:"",
+  message:"Failure",
+  nav:"/SignUp",
+  but:"Continue",
 }
 
 
@@ -46,40 +45,34 @@ const handleSubmit = async (e) => {
     const response = await axios.get(LOGIN_URL);
     console.log(response.data);
     console.log(response.data.status);
-    if(response.data.status=="approved")
+    if(this.state.pwd!==this.state.repwd)
+    {
+        this.setState({msg:"Passwords entered dont match !!!!",nav:"/SignUp",but:"Continue"});
+      this.setState({loggedIn:true});
+    }
+    else if(response.data.status=="success")
     {
       console.log("Saving User!!!");
-      var str = response.data.events;
-      var strLines = str.split("\n");
-      // console.log(strLines)
-
-      try{
-      for (var i in strLines) {
-      var obj = JSON.parse(strLines[i]);
-      obj.StartTime=obj.StartTime.replaceAll("-",",");
-      obj.EndTime=obj.EndTime.replaceAll("-",",");
-      obj.StartTime=eval("("+obj.StartTime+")");
-      obj.EndTime=eval("("+obj.EndTime+")");
-      this.setState(prevState => ({
-          events: [...prevState.events,obj]}));
+      this.setState({msg:"User Created Successfully !!!!",nav:"/",but:"Continue"});
+      this.setState({loggedIn:true});
     }
-  }
-  catch(e){}
-    console.log(this.state.events);
-      this.props.login(this.state.user,this.state.pwd,this.state.events);
-      this.setState({loggedIn:true,msg:"Logged In Successfully !!",but:"Continue",nav:"/"});
+    else if(response.data.status=="exists")
+    {
+        this.setState({msg:"User Already Exists !!!",nav:"/SignUp"});
+      this.setState({loggedIn:true});
     }
     else
     {
-      console.log("Denied Login");
-      this.setState({loggedIn:true,msg:"Bad Credentials !!",but:"Try Again",nav:"/LoginSignUp"});
+        this.setState({msg:"Failure!! PLease try Again !!!",nav:"/LoginSignUp"});
+        this.setState({loggedIn:true});
     }
-    console.log(JSON.stringify(response.status));
+
+    
    
     
 
 } catch (err) {
-  this.setState({loggedIn:true,msg:"Failed To Login !!",but:"Try Again",nav:"/LoginSignUp"});
+    this.setState({loggedIn:true});
     // if (!err?.response) {
     //     setErrMsg('No Server Response');
     // } else if (err.response?.status === 400) {
@@ -131,7 +124,6 @@ const handleSubmit = async (e) => {
         <TextField
           id="username"
           label="Username"
-          
           sx={{
             width: "38vw",
             height: "120vh",
@@ -164,6 +156,23 @@ const handleSubmit = async (e) => {
           required
         >
         </TextField>
+        <TextField
+          id="password"
+          label="Re-enter Password"
+          type="password"
+          sx={{
+            width: "38vw",
+            height: "120vh",
+            position:"absolute",
+            top:"38vh",
+            left:"3vw",
+          }}
+          
+          onChange={(e) => this.setState({repwd:e.target.value})}
+          value={this.state.repwd}
+          required
+        >
+        </TextField>
         </div>
         <div >
         
@@ -174,57 +183,12 @@ const handleSubmit = async (e) => {
           sx={{ p: 0 ,position:"absolute",
           width: "38vw",
           height: "6vh",
-          top:"38vh",
+          top:"48vh",
           left:"3vw",}}
           onClick={handleSubmit}
           >
-            Login </Button>
-            <Typography 
-            sx={{
-              fontSize: 15 ,
-              position:"absolute",
-              top:"46vh",
-              left:"21vw",
-            }}
-             color="text.secondary" gutterBottom>
-          OR
-        </Typography>
-        <Button variant = "contained"  
-            sx={{ 
+            Register </Button>
             
-              width: "38vw",
-              height: "6vh",
-              position:"absolute",
-              top:"50vh",
-              left:"3vw", }}>
-              <Google fontSize="large"  sx={{marginRight:"1vw"}}/> Sign in with Google
-              </Button>
-              <Typography 
-              variant="h6"
-              sx={{
-                fontSize:"1vw",
-                position:"absolute",
-                top:"62vh",
-                left:"7vw",
-              }}>
-                Don't have an account ? 
-              </Typography>
-        <Link to="/SignUp"
-          style={{
-            width: "12vw",
-            height: "6vh",
-            position:"absolute",
-            top:"61vh",
-            left:"24vw",
-            backgroundColor: "#1976d2",
-            textDecoration:"none",
-            color:"white",
-            display:"flex",
-            padding:"10px 0px 0px",
-            justifyContent:"center",
-
-          }}>
-            SIGN UP </Link>
         </div>
         </CardContent>
         </Card>
@@ -256,7 +220,7 @@ const handleSubmit = async (e) => {
                   top:"30%",
                   left:"17%"
                 }} color="text.secondary">
-                    {this.state.msg}
+                    {this.state.message}
                   </Typography>
                  
                             <Link to={this.state.nav} onClick={()=>{this.setState({loggedIn:false})}} style={{color:"white",textDecoration:"none",padding:"20px 20px 20px",backgroundColor:"red",
@@ -273,19 +237,6 @@ const handleSubmit = async (e) => {
         }
   }
 
-const mapDispatchToProps=(dispatch)=>
-{
-  return{
-    login: (user,pwd,events)=>{dispatch({type:"LOGIN",user:user,pwd:pwd,events:events})}
-  }
-}
 
-const mapStateToProps=(state)=>
-{
-  return {
-    user:state.user,
-    pwd:state.pwd,
-    }
-}
 
-export default connect(mapStateToProps,mapDispatchToProps)(LoginSignUp);
+export default SignUp;

@@ -1,0 +1,57 @@
+
+.footerdiv{
+    background-color:#B4C6DA;
+    width:100%;
+    color: #475261;
+    font-weight: bold;
+    margin:5% auto 0;
+}
+
+.grid-container{
+    display:grid;
+    grid-template-columns: repeat(6, 1fr);
+padding:3% 1%;
+    
+}
+.grid-item{
+    padding: 10% 2%;
+    text-align:left;
+    font:sans-serif;
+
+}
+
+
+.three{
+    grid-column-start: 3;
+    grid-column-end: 5;
+    grid-row-start:1;
+    grid-row-end:5;
+    text-align:center;
+
+}
+
+.four{
+    grid-column-start: 5;
+    grid-column-end: 6;
+    grid-row-start:1;
+    grid-row-end:5;
+    text-align:center;
+}
+.five{
+    grid-column-start: 6;
+    grid-column-end: 7;
+    grid-row-start:1;
+    grid-row-end:5;
+    text-align:center;
+
+}
+
+.footer-text{
+    padding:2%;
+    text-align:center;
+}
+
+.fb,.fb2{
+    width:40px;
+    margin:15%;
+}

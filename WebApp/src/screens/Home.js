@@ -1,19 +1,22 @@
-import React, { Component } from 'react';
-import { BrowserRouter as Router, Switch, Route, Link } from 'react-router-dom';
 
-class Home extends Component {
-  render() {
-    return (
-        <div>
+import React from "react";
+import '../designs/Home.css';
+import DivOne from "../components/DivOne.jsx";
+import DivTwo from "../components/DivTwo.jsx";
+import DivThree from "../components/DivThree.jsx";
+import Footer from "../components/Footer.jsx"
 
-          <h2>Home</h2>
-          
-          <Link to={'/ScheduleEvents'} className="nav-link">Schedule Events</Link>
-          <br></br>
-          <Link to={'/EmptyClass'} className="nav-link">Empty Class</Link>
-        </div>
-    );
-  }
+
+function App() {
+  return (
+    <div className="home-page">
+     <DivOne />
+     <DivTwo  />
+     <DivThree />
+     <Footer/>
+    </div>
+    
+  );
 }
 
-export default Home;
+export default App;

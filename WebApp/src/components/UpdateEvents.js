@@ -9,44 +9,52 @@ import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import {Grid} from '@mui/material/';
 import { Fade } from '@mui/material';
+import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
+import MenuItem from '@mui/material/MenuItem';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
+import axios from '../utils/axios';
 import Box from "@mui/material/Box";
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
-import { TimePicker } from '@mui/x-date-pickers/TimePicker';
-import { MobileDatePicker } from '@mui/x-date-pickers/MobileDatePicker';
 
 
+const repeat = [{value: 'Never',label: 'Never',},
+{value: 'Daily',label: 'Daily',},
+{value: 'Weekly',label: 'Weekly',},
+{value: 'Monthly',label: 'Monthly',},
+{value: 'Yearly',label: 'Yearly',},
+];
 
-class CabShare extends Component 
+const type = [{value: 'public',label: 'public',},
+{value: 'private',label: 'private',}
+];
+
+class UpdateEvents extends Component 
 {
     state={
         cfade:false,
-        fade:true,
-        fare:"Never",
+        fade:false,
+        repeat:"Never",
         type:"public",
         title:"",
         loc:"",
-        date: new Date(),
-        time: new Date(),
+        start: new Date(),
+        end: new Date(),
         description:"",
         loggedIn:false,
         md:"none",
         sx:"none",
         redirect:"flex",
         checked:false,
-        dest:"",
-        owner:"",
-        id:"",
-        events:[],
+        Id:0,
+        show:"none",
 
     }
 
     componentDidMount()
     {
-      console.log("Inside CabShare!!!");
-      const {events} =this.props.events;
+      const {events} =this.props;
         this.setState({events:events});
         console.log(this.props);
         this.setState({loggedIn:this.props.loggedIn})
@@ -74,46 +82,10 @@ class CabShare extends Component
     render()
     {
 
-
-      const handleNameChange = (event) => {
-        this.setState({title:event.target.value});
-      };
-  
-      const handlePhnoChange = (event) => {
-        this.setState({loc:event.target.value});
-      };
-  
-      const handleDateChange = (newValue) => {
-        this.setState({date:newValue});
-      };
-
-      const handleDestChange = (event) => {
-        this.setState({dest:event.target.value});
-      };
-  
-      const handleTimeChange = (newValue) => {
-        this.setState({time:newValue});
-      };
-     
-  
-      const handleFareChange=(event)=>{
-        this.setState({fare:event.target.value});
-      }
-  
-
-
       const handleEditEvent=(id)=>
       {
         const curr = this.props.events.find(event=>event.Id=id);
-        this.setState({
-          id:id,
-          fare:curr.fare,
-          date:curr.date,
-          time:curr.time,
-          dest:curr.dest,
-          from:curr.from,
-          owner:curr.owner,
-        });
+        this.setState({Id:id,title:curr.Subject,loc:curr.Location,start:curr.StartTime,end:curr.EndTime,description:curr.Description});
         this.setState({show:"flex"});
         console.log(this.state);
         console.log(id);
@@ -126,7 +98,7 @@ class CabShare extends Component
         events.map((event) => {
           
             return(
-                <div className="collection-item" key={event.id}>
+                <div className="collection-item" key={event.Id}>
                   <Grid
               className="entry"
                 container
@@ -144,29 +116,27 @@ class CabShare extends Component
                   <Typography sx={{fontSize:"160%",
                   
                 }} color="text.secondary">
-                   {event.from} to {event.dest}
+                   {event.Subject}
                   </Typography>
                   <Typography sx={{fontSize:"100%",
                   
                 }} color="text.secondary">
-                   Date : {event.date.toString().slice(0,15)}
+                   Location : {event.Location}
                   </Typography>
                   <Typography sx={{fontSize:"100%",
                   
                 }} color="text.secondary">
-                   Time : {event.time.toString(15,event.time.toString().length)}
+                   Start : {event.StartTime.toString()}
                   </Typography>
-                 
                   <Typography sx={{fontSize:"100%",
                   
                 }} color="text.secondary">
-                   Phone No : {event.phno}
+                   End : {event.EndTime.toString()}
                   </Typography>
-
                   <Typography sx={{fontSize:"100%",
                   
                 }} color="text.secondary">
-                   Owner : {event.owner}
+                   Description : {event.Description}
                   </Typography>
                   
                   <Button variant="outlined" startIcon={<EditIcon />}  sx={{margin:"1% 1% 1%"}} onClick={()=>{handleEditEvent(event.Id)}}>
@@ -186,32 +156,7 @@ class CabShare extends Component
                 )
         })
     ):(
-      <Grid
-      className="entry"
-        container
-        
-        >
-      <Card
-          sx={{
-          width:"60rem",
-          borderRadius: "1.5rem",
-          margin:"2% 2% 2%",
-         
-                }}
-                >
-        <CardContent>
-          <Typography sx={{fontSize:"160%",
-          
-        }} color="text.secondary">Empty
-           
-          </Typography>
-         
-          
-
-
-                </CardContent>
-                </Card>
-            </Grid>
+        <p className="center">You have no events left !!</p>
     )
     return(
         <div className="events collection">
@@ -220,6 +165,95 @@ class CabShare extends Component
     )
 }
         
+     
+          const handleChangeEvent=async ()=>{
+            const newStart =new Date(this.state.end.toString());
+            const newEnd = new Date(this.state.end.toString());
+            const id=this.state.Id;
+            console.log(newStart);
+            const event = {Id:id,Subject : this.state.title,StartTime:newStart,
+              EndTime:newEnd,Location:this.state.loc,Description:this.state.description}
+           // setTimeout(()=>{this.props.addEvent(this.state.events)},100);
+           console.log(event);
+           this.props.editEvent(event,id);
+           console.log(this.props);
+           
+           
+           try{
+          const d = new Date(this.state.start.toString());
+          const newStart1="new Date("+d.getFullYear()+"-"+d.getMonth()+"-"+d.getDate()+"-"+d.getHours()+"-"+d.getMinutes()+")";
+          const d1 = new Date(this.state.end.toString());
+          const newEnd1="new Date("+d1.getFullYear()+"-"+d1.getMonth()+"-"+d1.getDate()+"-"+d1.getHours()+"-"+d1.getMinutes()+")";
+          console.log(d1);
+          const even = JSON.stringify(event);
+          const eve=JSON.parse(even);
+          console.log(event);
+          eve.StartTime=newStart1;
+          eve.EndTime=newEnd1;  
+          // console.log(eve);
+          var str = JSON.stringify(eve);
+            str=str.slice(1,str.length-1);
+            var paras = str.split(",");
+            var x=LOGIN_URL;
+            
+           
+            for(var i in paras)
+            {
+              str=paras[i].split(":");
+              x=x+'&'+str[0]+'='+str[1]
+            }
+            x=x.replaceAll("\"","");
+            console.log(x);
+            
+             const response = await axios.get(x,
+              {headers:{
+              'Access-Control-Allow-Origin' : '*',
+  'Access-Control-Allow-Methods':'GET,PUT,POST,DELETE,PATCH,OPTIONS',}});
+             if(response.data.status==="Success")
+             {
+                console.log("Lets GOOOOO!!!!!");
+             }
+             console.log(response);
+            }
+            catch(e){
+              console.log(e);
+            }
+           this.setState({addEvent:false});
+           this.setState({eventAdded:true});
+           this.setState({show:"none"});
+           console.log(this.props);
+           // useHistory.push("/");
+           console.log(this.props.events);
+           this.setState({Id:0,title:'',loc:'',start:new Date(),end:new Date(),description:''});
+        }
+
+        const handleTitleChange = (event) => {
+            this.setState({title:event.target.value});
+          };
+      
+          const handleLocChange = (event) => {
+            this.setState({loc:event.target.value});
+          };
+      
+          const handleStartChange = (newValue) => {
+            this.setState({start:newValue});
+          };
+      
+          const handleEndChange = (newValue) => {
+            this.setState({end:newValue});
+          };
+          const handleDescChange = (event) => {
+            this.setState({description:event.target.value});
+          };
+      
+          const handleRepeatChange=(event)=>{
+            this.setState({repeat:event.target.value});
+          }
+      
+          const handleTypeChange=(event)=>{
+            this.setState({type:event.target.value});
+          }
+
 
         return(
             <div>
@@ -271,12 +305,10 @@ class CabShare extends Component
                 <Typography sx={{fontSize:"260%",position:"absolute",top:"10%",left:"5%",
                   
                 }} color="red">
-                   CAB SHARING
+                   EVENTS
                   </Typography>
-                  <Link to="/" style={{color:"white",textDecoration:"none",padding:"20px 20px 20px",backgroundColor:"red",
-                          position:"absolute",top:"10%",left:"30%",borderRadius:"10px"}}>BACK</Link>
-                  <Link to="/AddCab" style={{color:"white",textDecoration:"none",padding:"20px 20px 20px",backgroundColor:"red",
-                          position:"absolute",top:"10%",left:"45%",borderRadius:"10px"}}>Share a Cab</Link>
+                  <Link to="/ScheduleEvents" style={{color:"white",textDecoration:"none",padding:"20px 20px 20px",backgroundColor:"red",
+                          position:"absolute",top:"10%",left:"25%",borderRadius:"10px"}}>BACK</Link>
   
         <Box sx={{display:"flex",position:"absolute",top:"15%"}}>
           {ShowEvents(this.props.events)}
@@ -305,16 +337,16 @@ class CabShare extends Component
                         >
                 <CardContent>
                   <Typography sx={{ fontSize: 30 }} color="text.secondary" gutterBottom>
-                        Add Cab
+                        Edit Event
                   </Typography>
                   <div >
         <TextField
           id="username"
-          label="Name"
+          label="Title"
           variant="standard"
           color="error"
           value={this.state.title}
-          onChange={handleNameChange}
+          onChange={handleTitleChange}
           sx={{
             width: "270px",
             height: "120px",
@@ -332,9 +364,9 @@ class CabShare extends Component
         <div >
         <TextField
           id="password"
-          label="Phone No"
+          label="Location"
           value={this.state.loc}
-          onChange={handlePhnoChange}
+          onChange={handleLocChange}
           sx={{
             width: "270px",
             height: "120px",
@@ -349,37 +381,17 @@ class CabShare extends Component
         >
         </TextField>
         </div>
-        <div >
-        <TextField
-          id="password"
-          label="Destination"
-          value={this.state.dest}
-          onChange={handleDestChange}
-          sx={{
-            width: "270px",
-            height: "120px",
-            position:"absolute",
-            top:"220px",
-            left:"350px",
-          }}
-          variant="standard"
-          // onChange={(e) => setPwd(e.target.value)}
-          color="error"
-          required
-        >
-        </TextField>
-        </div>
         <div  style={{
           position:"absolute",
             top:"150px",
             left:"50px",
           }}>
         <LocalizationProvider dateAdapter={AdapterDayjs}>
-        <MobileDatePicker
+        <DateTimePicker
         
-          label="Date"
-          value={this.state.date}
-          onChange={handleDateChange}
+          label="Start"
+          value={this.state.start}
+          onChange={handleStartChange}
           renderInput={(params) => <TextField color="error" {...params} />}
          
         />
@@ -392,11 +404,11 @@ class CabShare extends Component
             left:"350px",
           }}>
         <LocalizationProvider dateAdapter={AdapterDayjs}>
-        <TimePicker
+        <DateTimePicker
         
-          label="Time"
-          value={this.state.time}
-          onChange={handleTimeChange}
+          label="End"
+          value={this.state.end}
+          onChange={handleEndChange}
           renderInput={(params) => <TextField color="error" {...params} />}
          
         />
@@ -406,10 +418,11 @@ class CabShare extends Component
         <div >
         <TextField
           id="filled-select-currency"
-          label="Total Fare"
+          select
+          label="Repeat"
           color="error"
-          value={this.state.fare}
-          onChange={handleFareChange}
+          value={this.state.repeat}
+          onChange={handleRepeatChange}
           size="small"
           variant="filled"
           sx={{
@@ -419,12 +432,52 @@ class CabShare extends Component
             top:"220px",
             left:"50px",
           }}
-        />
-          
-        
+        >
+          {repeat.map((option) => (
+            <MenuItem key={option.value} value={option.value}>
+              {option.label}
+            </MenuItem>
+          ))}
+        </TextField>
+        <TextField
+          id="filled-select-currency"
+          select
+          label="Type"
+          color="error"
+          value={this.state.type}
+          onChange={handleTypeChange}
+          size="small"
+          variant="filled"
+          sx={{
+            width: "270px",
+            height: "120px",
+            position:"absolute",
+            top:"220px",
+            left:"350px",
+          }}
+        >
+          {type.map((option) => (
+            <MenuItem key={option.value} value={option.value}>
+              {option.label}
+            </MenuItem>
+          ))}
+        </TextField>
         </div>
-        
-                            <Button variant="contained" onClick={handleEditEvent}
+        <TextField
+          id="outlined-multiline-flexible"
+          label="Description"
+          variant="filled"
+          color="error"
+          multiline
+          maxRows={4}
+          value={this.state.description}
+          onChange={handleDescChange}
+          sx={{top:"210px",
+               left:"30px",
+               width:"500px",
+          }}
+        />
+                            <Button variant="contained" onClick={handleChangeEvent}
                             color="error"
                                sx={{
                                 width: "5vw",
@@ -468,7 +521,7 @@ class CabShare extends Component
                   top:"30%",
                   left:"17%"
                 }} color="text.secondary">
-                    Event Added Successfully !!!
+                    Event Updated Successfully !!!
                   </Typography>
                  
                             <Link to="/ScheduleEvents" style={{color:"white",textDecoration:"none",padding:"20px 20px 20px",backgroundColor:"red",
@@ -478,6 +531,7 @@ class CabShare extends Component
                         </Card>
                     </Grid>
                     </Fade>
+                    
             </div>
         );
     }
@@ -485,7 +539,7 @@ class CabShare extends Component
 
 const mapStateToProps = (state) => {
 return{
-  events: state.cabShare,
+  events: state.events,
   user:state.user,
   pwd:state.pwd,
   loggedIn:state.loggedIn,
@@ -500,4 +554,4 @@ const mapDispatchToProps =(dispatch) =>
 }
 
 // export default connect(mapStateToProps,mapDispatchToProps)(ScheduleEvents);
-export default connect(mapStateToProps,mapDispatchToProps)(CabShare);
+export default connect(mapStateToProps,mapDispatchToProps)(UpdateEvents);
